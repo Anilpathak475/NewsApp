@@ -1,7 +1,6 @@
-package com.anil.hse.networking
+package com.anil.newapp.networking
 
 import android.util.Log
-import com.anil.newapp.networking.Resource
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 
