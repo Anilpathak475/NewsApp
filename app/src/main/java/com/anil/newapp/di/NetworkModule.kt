@@ -1,8 +1,8 @@
 package com.anil.newapp.di
 
+import com.anil.newapp.networking.ArticleClient
 import com.anil.newapp.networking.AuthInterceptor
-import com.anil.newapp.networking.NewsClient
-import com.anil.newapp.networking.ResponseHandler
+import com.anil.newapp.networking.NewsApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -16,7 +16,8 @@ val networkModule = module {
     single { provideNewsApi(get()) }
     single { provideLoggingInterceptor() }
     single { provideRetrofit(get()) }
-    single { ResponseHandler() }
+    single { provideNewsClient(get()) }
+
 }
 
 private fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -38,4 +39,5 @@ private fun provideLoggingInterceptor(): HttpLoggingInterceptor {
     return logger
 }
 
-private fun provideNewsApi(retrofit: Retrofit): NewsClient = retrofit.create(NewsClient::class.java)
+private fun provideNewsApi(retrofit: Retrofit): NewsApi = retrofit.create(NewsApi::class.java)
+private fun provideNewsClient(newsApi: NewsApi): ArticleClient = ArticleClient(newsApi)

@@ -7,17 +7,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.anil.newapp.R
 import com.anil.newapp.base.gone
-import com.anil.newapp.base.visible
-import com.anil.newapp.model.Article
-import com.anil.newapp.model.ArticleResponse
-import com.anil.newapp.networking.Resource
-import com.anil.newapp.networking.Status
+import com.anil.newapp.persistance.entitiy.Article
 import com.anil.newapp.ui.adapter.NewsAdapter
 import com.anil.newapp.ui.viewmodel.NewsViewModel
 import kotlinx.android.synthetic.main.fragment_news.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 /**
  * A simple [Fragment] subclass.
@@ -33,19 +33,9 @@ class NewsFragment : Fragment() {
     }
 
     private val newsObserver by lazy {
-        Observer<Resource<ArticleResponse>> {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    loading.gone()
-                    it.data?.articles?.let { newsAdapter.articals = it }
-                }
-                Status.ERROR -> {
-                    it.message?.let { it1 -> notify(it1) }
-                }
-                Status.LOADING -> {
-                    loading.visible()
-                }
-            }
+        Observer<List<Article>> {
+            loading.gone()
+            newsAdapter.articals = it
         }
     }
 
@@ -57,7 +47,19 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         newsViewModel.articleResponse.observe(
-            viewLifecycleOwner, newsObserver)
+            viewLifecycleOwner, newsObserver
+        )
+        newsViewModel.error.observe(
+            viewLifecycleOwner, Observer { notify(it) }
+        )
+        val layoutManager = GridLayoutManager(context, 2)
+
+        layoutManager.spanSizeLookup = object : SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position % 8 == 0) 2 else 1
+            }
+        }
+        recyclerViewNews.layoutManager = layoutManager
         recyclerViewNews.adapter = newsAdapter
     }
 
@@ -67,7 +69,8 @@ class NewsFragment : Fragment() {
     private fun onArticleSelected(
         article: Article
     ) {
-
+        val direction = NewsFragmentDirections.actionNewsFragmentToNewsDetailFragment(article.url)
+        findNavController().navigate(direction)
     }
 
 }

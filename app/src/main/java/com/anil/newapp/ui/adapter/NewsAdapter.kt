@@ -5,9 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.anil.newapp.R
-import com.anil.newapp.model.Article
+import com.anil.newapp.persistance.entitiy.Article
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_news.view.*
 import kotlin.properties.Delegates
+
 
 class NewsAdapter(
     val onSelected: (category: Article) -> Unit
@@ -23,7 +25,12 @@ class NewsAdapter(
 
     override fun onBindViewHolder(vh: CartViewHolder, position: Int) {
         val article = articals[position]
-        vh.itemView.textViewNewsTitle.text = article.title
+        vh.itemView.textViewArticleTitle.text = article.title
+        vh.itemView.textViewAuther.text = article.author
+        Glide.with(vh.itemView)
+            .load(article.urlToImage)
+            .placeholder(R.drawable.loading)
+            .into(vh.itemView.imageViewArticle)
         vh.itemView.setOnClickListener { onSelected(article) }
     }
 

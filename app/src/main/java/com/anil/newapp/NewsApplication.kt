@@ -2,6 +2,7 @@ package com.anil.newapp
 
 import android.app.Application
 import com.anil.newapp.di.networkModule
+import com.anil.newapp.di.persistenceModule
 import com.anil.newapp.di.repositoryModule
 import com.anil.newapp.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -15,6 +16,7 @@ class NewsApplication : Application() {
             modules(networkModule)
             modules(viewModelModule)
             modules(repositoryModule)
+            modules(persistenceModule)
         }
     }
 }

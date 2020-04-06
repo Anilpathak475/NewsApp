@@ -1,19 +1,17 @@
 package com.anil.newapp.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import com.anil.newapp.networking.Resource
-import com.anil.newapp.repository.NewsRepository
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.MutableLiveData
+import com.anil.newapp.base.LiveCoroutinesViewModel
+import com.anil.newapp.repository.ArticleRepository
 
 class NewsViewModel(
-    private val newsRepository: NewsRepository
-):ViewModel() {
+    private val articleRepository: ArticleRepository
+) : LiveCoroutinesViewModel() {
 
+    val error = MutableLiveData<String>()
     val articleResponse by lazy {
-        liveData(Dispatchers.Main) {
-            emit(Resource.loading(null))
-            emit(newsRepository.loadTopHeadlines())
+        launchOnViewModelScope {
+            articleRepository.getArticles { error.postValue(it) }
         }
     }
 }

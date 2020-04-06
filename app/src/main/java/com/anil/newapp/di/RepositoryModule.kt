@@ -1,9 +1,8 @@
 package com.anil.newapp.di
 
-import com.anil.newapp.repository.NewsRepository
+import com.anil.newapp.repository.ArticleRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single { NewsRepository(get(), get()) }
-
+    single { ArticleRepository(get(), get()) }
 }

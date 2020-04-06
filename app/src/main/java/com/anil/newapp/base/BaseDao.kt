@@ -14,7 +14,7 @@ interface BaseDao<T> {
      * @param obj the object to be inserted.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(obj: List<T>)
+    fun insert(obj: List<T>): List<Long>
 
     /**
      * Insert an array of objects in the database.
@@ -48,8 +48,5 @@ interface BaseDao<T> {
      */
     @Delete
     fun delete(obj: T)
-
-    @Delete
-    fun delete(obj: List<T>)
 
 }
