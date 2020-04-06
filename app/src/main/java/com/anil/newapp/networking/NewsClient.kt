@@ -7,7 +7,7 @@ import retrofit2.http.Query
 interface NewsClient {
     @GET("v2/top-headlines")
     suspend fun fetchNews(
-        @Query("country", encoded = true) country: String = "DE",
-        @Query("apiKey", encoded = true) apiKey: String = "8e748d8db9c6466791912adc282e3bbc"
+        @Query("country") country: String = "DE",
+        @Query("apiKey") apiKey: String = "8e748d8db9c6466791912adc282e3bbc"
     ): ArticleResponse
 }
