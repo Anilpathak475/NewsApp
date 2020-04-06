@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 val networkModule = module {
     single { AuthInterceptor() }
     single { provideOkHttpClient(get(), get()) }
-    single { provideHseApi(get()) }
+    single { provideNewsApi(get()) }
     single { provideLoggingInterceptor() }
     single { provideRetrofit(get()) }
     single { ResponseHandler() }
@@ -38,4 +38,4 @@ private fun provideLoggingInterceptor(): HttpLoggingInterceptor {
     return logger
 }
 
-private fun provideHseApi(retrofit: Retrofit): NewsClient = retrofit.create(NewsClient::class.java)
+private fun provideNewsApi(retrofit: Retrofit): NewsClient = retrofit.create(NewsClient::class.java)
