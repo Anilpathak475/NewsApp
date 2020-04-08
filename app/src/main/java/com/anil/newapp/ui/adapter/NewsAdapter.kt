@@ -14,7 +14,7 @@ import kotlin.properties.Delegates
 class NewsAdapter(
     val onSelected: (category: Article) -> Unit
 ) : RecyclerView.Adapter<NewsAdapter.CartViewHolder>() {
-    var articals by Delegates.observable(emptyList<Article>()) { _, _, _ ->
+    var articles by Delegates.observable(emptyList<Article>()) { _, _, _ ->
         notifyDataSetChanged()
     }
 
@@ -24,7 +24,7 @@ class NewsAdapter(
     }
 
     override fun onBindViewHolder(vh: CartViewHolder, position: Int) {
-        val article = articals[position]
+        val article = articles[position]
         vh.itemView.textViewArticleTitle.text = article.title
         vh.itemView.textViewAuther.text = article.author
         Glide.with(vh.itemView)
@@ -34,7 +34,7 @@ class NewsAdapter(
         vh.itemView.setOnClickListener { onSelected(article) }
     }
 
-    override fun getItemCount() = articals.size
+    override fun getItemCount() = articles.size
 
     class CartViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

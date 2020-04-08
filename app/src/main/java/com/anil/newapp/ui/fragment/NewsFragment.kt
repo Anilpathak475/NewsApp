@@ -33,9 +33,10 @@ class NewsFragment : Fragment() {
     }
 
     private val newsObserver by lazy {
-        Observer<List<Article>> {
+        Observer<MutableList<Article>> {
             loading.gone()
-            newsAdapter.articals = it
+            pullToRefresh.isRefreshing = false
+            newsAdapter.articles = it
         }
     }
 
@@ -47,7 +48,7 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         newsViewModel.articleResponse.observe(
-            viewLifecycleOwner, newsObserver
+            viewLifecycleOwner, Observer { }
         )
         newsViewModel.error.observe(
             viewLifecycleOwner, Observer { notify(it) }
@@ -61,6 +62,7 @@ class NewsFragment : Fragment() {
         }
         recyclerViewNews.layoutManager = layoutManager
         recyclerViewNews.adapter = newsAdapter
+        pullToRefresh.setOnRefreshListener { newsViewModel.getFreshArticles() }
     }
 
     private fun notify(message: String) =

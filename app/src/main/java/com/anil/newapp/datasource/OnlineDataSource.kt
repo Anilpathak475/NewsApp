@@ -1,24 +1,21 @@
 package com.anil.newapp.datasource
 
-import com.anil.newapp.networking.ApiResponse
-import com.anil.newapp.networking.ArticleClient
-import com.anil.newapp.networking.message
-import com.anil.newapp.persistance.entitiy.Article
+import com.anil.newapp.model.ArticleResponse
+import com.anil.newapp.networking.NewsApi
+import io.reactivex.Single
 
-class OnlineDataSource(private val articleClient: ArticleClient) : DataSource {
-    override fun getArticles(
-        response: (articles: List<Article>) -> Unit,
-        error: (error: String) -> Unit
-    ) {
-        articleClient.fetchArticles { apiResponse ->
-            when (apiResponse) {
-                is ApiResponse.Success -> apiResponse.data?.let {
-                    response(it.articles)
-                }
-                is ApiResponse.Failure.Error -> error(apiResponse.message())
-                is ApiResponse.Failure.Exception -> error(apiResponse.message())
-            }
-        }
-    }
+class OnlineDataSource(
+    private val newsApi: NewsApi
+) {
+    fun getArticles(
+        page: Int
+    ): Single<ArticleResponse> =
+        newsApi.fetchNews(page = page)
+
+    fun getArticlesByTopic(
+        topic: String
+    ): Single<ArticleResponse> =
+        newsApi.fetchNews()
+
 
 }
