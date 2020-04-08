@@ -13,7 +13,6 @@ interface NewsApi {
         @Query("sortBy") sortBy: String = "latest",
         @Query("apiKey") apiKey: String = "8e748d8db9c6466791912adc282e3bbc",
         @Query("page") page: Int = 1
-
     ): Single<ArticleResponse>
 }
 

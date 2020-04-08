@@ -1,36 +1,52 @@
 package com.anil.newapp.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.anil.newapp.base.LiveCoroutinesViewModel
 import com.anil.newapp.persistance.entitiy.Article
 import com.anil.newapp.repository.ArticleRepository
 import com.anil.newapp.repository.NewsBoundaryCallback
 import com.anil.newapp.repository.NewsQueryResult
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
 
 class NewsViewModel(
     private val articleRepository: ArticleRepository,
     private val newsBoundaryCallback: NewsBoundaryCallback
-) : LiveCoroutinesViewModel() {
+) : ViewModel() {
 
-    private val _queryReposLiveData = MutableLiveData<Boolean>()
+    private val compositeDisposable by lazy { CompositeDisposable() }
+    /*  private val connectivityDisposable by lazy {
+          ReactiveNetwork
+              .observeInternetConnectivity()
+              .subscribeOn(Schedulers.io())
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe({ networkAvailability ->
+                  networkState.postValue(networkAvailability)
+                  Timber.d("Connectivity state: ON")
+              },
+                  {
+                      networkState.postValue(false)
+                      Timber.d("Connectivity state: ERROR")
+                  })
+      }*/
+    private val queryReposLiveData = MutableLiveData<Boolean>()
 
-    private val _repoResult by lazy {
-        Transformations.map(_queryReposLiveData) {
-            callPagedListQuery()
+    private val articleQueryResult by lazy {
+        queryReposLiveData.switchMap {
+            liveData(Dispatchers.IO) {
+                emit(callPagedListQuery())
+            }
         }
     }
 
-    val repos: LiveData<PagedList<Article>> by lazy {
-        Transformations.switchMap(_repoResult) { it.data }
+    val articles: LiveData<PagedList<Article>> by lazy {
+        articleQueryResult.switchMap { it.data }
     }
-    val githubError: LiveData<Boolean> by lazy { Transformations.switchMap(_repoResult) { it.articleErrors } }
-    val networkError: LiveData<Boolean> =
-        Transformations.switchMap(_repoResult) { it.networkErrors }
-
+    val articleErrors: LiveData<Boolean> by lazy { articleQueryResult.switchMap { it.articleErrors } }
+    val networkError: LiveData<Boolean> by lazy {
+        articleQueryResult.switchMap { it.networkErrors }
+    }
 
     private fun callPagedListQuery(): NewsQueryResult {
         val dataSourceFactory = articleRepository.getAllArticlesAsDataSourceOffline()
@@ -40,8 +56,7 @@ class NewsViewModel(
         val data = LivePagedListBuilder(
             dataSourceFactory,
             DATABASE_PAGE_SIZE
-        )
-            .setBoundaryCallback(newsBoundaryCallback)
+        ).setBoundaryCallback(newsBoundaryCallback)
             .build()
         return NewsQueryResult(
             data,
@@ -50,6 +65,13 @@ class NewsViewModel(
             networkErrors
         )
     }
+
+    val networkState by lazy { MutableLiveData<Boolean>() }
+
+    init {
+        queryReposLiveData.postValue(true)
+    }
+
 
     override fun onCleared() {
         super.onCleared()
