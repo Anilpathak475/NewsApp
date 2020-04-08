@@ -56,7 +56,7 @@ class NewsFragment : Fragment() {
 
         layoutManager.spanSizeLookup = object : SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (position % 8 == 0) 2 else 1
+                return if (position % 7 == 0) 2 else 1
             }
         }
         recyclerViewNews.layoutManager = layoutManager
@@ -69,8 +69,14 @@ class NewsFragment : Fragment() {
     private fun onArticleSelected(
         article: Article
     ) {
-        val direction = NewsFragmentDirections.actionNewsFragmentToNewsDetailFragment(article.url)
-        findNavController().navigate(direction)
+        article.url?.let {
+            val direction = NewsFragmentDirections.actionNewsFragmentToNewsDetailFragment(
+                it
+            )
+            findNavController().navigate(direction)
+        }
+
+
     }
 
 }

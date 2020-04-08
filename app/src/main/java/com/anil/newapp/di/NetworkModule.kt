@@ -1,5 +1,6 @@
 package com.anil.newapp.di
 
+import com.anil.newapp.datasource.OnlineDataSource
 import com.anil.newapp.networking.ArticleClient
 import com.anil.newapp.networking.AuthInterceptor
 import com.anil.newapp.networking.NewsApi
@@ -17,6 +18,7 @@ val networkModule = module {
     single { provideLoggingInterceptor() }
     single { provideRetrofit(get()) }
     single { provideNewsClient(get()) }
+    single { OnlineDataSource(get()) }
 
 }
 

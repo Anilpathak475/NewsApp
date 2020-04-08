@@ -1,6 +1,5 @@
 package com.anil.newapp.networking
 
-import com.skydoves.disneymotions.network.ApiResponse
 import retrofit2.Call
 import retrofit2.Callback
 
