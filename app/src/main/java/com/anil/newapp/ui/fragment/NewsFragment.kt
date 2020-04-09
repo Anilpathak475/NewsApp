@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.anil.newapp.R
+import com.anil.newapp.base.gone
+import com.anil.newapp.base.visible
 import com.anil.newapp.persistance.entitiy.Article
 import com.anil.newapp.ui.adapter.NewsAdapter
 import com.anil.newapp.ui.viewmodel.NewsViewModel
@@ -37,9 +39,23 @@ class NewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val layoutManager = GridLayoutManager(context, 2)
+
+        layoutManager.spanSizeLookup = object : SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position % 7 == 0) 2 else 1
+            }
+        }
+        recyclerViewNews.layoutManager = layoutManager
+        recyclerViewNews.adapter = newsAdapter
+        newsAdapter.itemSelected = {
+            onArticleSelected(it)
+        }
         newsViewModel.articles.observe(
             viewLifecycleOwner, Observer {
                 newsAdapter.submitList(it)
+                loading.gone()
+                recyclerViewNews.visible()
             }
         )
         newsViewModel.networkError.observe(
@@ -57,18 +73,8 @@ class NewsFragment : Fragment() {
                 }
             }
         )
-        val layoutManager = GridLayoutManager(context, 2)
 
-        layoutManager.spanSizeLookup = object : SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (position % 7 == 0) 2 else 1
-            }
-        }
-        recyclerViewNews.layoutManager = layoutManager
-        recyclerViewNews.adapter = newsAdapter
-        newsAdapter.itemSelected = {
-            onArticleSelected(it)
-        }
+
         networkErrorListener()
         githubErrorListener()
     }
@@ -77,7 +83,8 @@ class NewsFragment : Fragment() {
     private fun networkErrorListener() {
         newsViewModel.networkError.observe(viewLifecycleOwner, Observer { isNetworkError ->
             if (isNetworkError) {
-                //       activityGeneralMessagesUtils.showSnackBarWithCloseButton(getString(R.string.internet_connection_problem))
+                notify(getString(R.string.internet_connection_problem))
+
             }
         })
 
@@ -88,9 +95,9 @@ class NewsFragment : Fragment() {
     }
 
     private fun githubErrorListener() {
-        newsViewModel.articleErrors.observe(viewLifecycleOwner, Observer { isGithubError ->
-            if (isGithubError) {
-                // activityGeneralMessagesUtils.showSnackBarWithCloseButton(getString(R.string.github_error))
+        newsViewModel.articleErrors.observe(viewLifecycleOwner, Observer { isApiError ->
+            if (isApiError) {
+                notify(getString(R.string.api_error))
             }
         })
     }

@@ -78,7 +78,7 @@ class NewsBoundaryCallback constructor(
                     }
                     isRequestInProgress = false
                     _isRequestInProgress.value = false
-                    Timber.d("Repo Saver. Error : ${throwable.message}")
+                    Timber.d("Article Saver. Error : ${throwable.message}")
                 }
             )
 

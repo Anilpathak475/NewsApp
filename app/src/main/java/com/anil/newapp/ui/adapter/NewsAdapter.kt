@@ -10,13 +10,10 @@ import com.anil.newapp.R
 import com.anil.newapp.persistance.entitiy.Article
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_news.view.*
-import kotlin.properties.Delegates
 
 
 class NewsAdapter : PagedListAdapter<Article, NewsAdapter.ArticleViewHolder>(DIFF_CALLBACK) {
-    var articles by Delegates.observable(emptyList<Article>()) { _, _, _ ->
-        notifyDataSetChanged()
-    }
+
     var itemSelected: (selectedArticle: Article) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
@@ -25,17 +22,16 @@ class NewsAdapter : PagedListAdapter<Article, NewsAdapter.ArticleViewHolder>(DIF
     }
 
     override fun onBindViewHolder(vh: ArticleViewHolder, position: Int) {
-        val article = articles[position]
-        vh.itemView.textViewArticleTitle.text = article.title
-        vh.itemView.textViewAuther.text = article.author
-        Glide.with(vh.itemView)
-            .load(article.urlToImage)
-            .placeholder(R.drawable.loading)
-            .into(vh.itemView.imageViewArticle)
-        vh.itemView.setOnClickListener { itemSelected.invoke(article) }
+        getItem(position)?.let {
+            vh.itemView.textViewArticleTitle.text = it.title
+            vh.itemView.textViewAuther.text = it.author
+            Glide.with(vh.itemView)
+                .load(it.urlToImage)
+                .placeholder(R.drawable.loading)
+                .into(vh.itemView.imageViewArticle)
+            vh.itemView.setOnClickListener { _ -> itemSelected.invoke(it) }
+        }
     }
-
-    override fun getItemCount() = articles.size
 
     class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

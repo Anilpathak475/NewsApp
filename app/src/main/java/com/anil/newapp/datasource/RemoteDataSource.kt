@@ -4,7 +4,7 @@ import com.anil.newapp.model.ArticleResponse
 import com.anil.newapp.networking.NewsApi
 import io.reactivex.Single
 
-class OnlineDataSource(
+class RemoteDataSource(
     private val newsApi: NewsApi
 ) {
     fun getArticles(
